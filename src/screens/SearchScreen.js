@@ -1,39 +1,34 @@
 import React, {useState} from 'react';
+import PropTypes from 'prop-types';
+
 import {
   StyleSheet,
   View,
   TextInput,
-  ScrollView,
   FlatList,
   ActivityIndicator,
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
 
-//Icons EvilIcons
+//Icons IonicIcons
 import Icon from 'react-native-vector-icons/Ionicons';
 
 //Components
 import MiniCard from '../components/MiniCard';
 
-const SearchScreen = ({navigation}) => {
-  const [text, setText] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchData, setSearchData] = useState({});
-  //265c0a6f361f468f880f6ef912a16b30
-  const fetchSearchData = () => {
-    setIsLoading(true);
-    fetch(
-      `http://newsapi.org/v2/everything?q=${text}&from=2020-07-17&sortBy=publishedAt&apiKey=847e59bd8f874476998547a9ca76867d`,
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        //  console.log(data);
-        setSearchData(data.articles);
-        setIsLoading(false);
-      });
-  };
+//Redux
+import {connect} from 'react-redux';
 
+//actions
+import {getSearchData} from '../actions/homeScreenAction';
+
+const SearchScreen = ({
+  navigation,
+  getSearchData,
+  homeScreenReducer: {searchData, loading},
+}) => {
+  const [text, setText] = useState('');
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.searchContainer}>
@@ -55,11 +50,13 @@ const SearchScreen = ({navigation}) => {
           <Icon
             name="md-send"
             size={32}
-            onPress={() => fetchSearchData()}
+            onPress={() => {
+              getSearchData(text);
+            }}
             style={{color: 'gray'}}
           />
         </View>
-        {isLoading ? (
+        {loading ? (
           <ActivityIndicator
             size="large"
             color="red"
@@ -88,7 +85,16 @@ const SearchScreen = ({navigation}) => {
   );
 };
 
-export default SearchScreen;
+SearchScreen.propTypes = {
+  homeScreenReducer: PropTypes.object.isRequired,
+  getSearchData: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  homeScreenReducer: state.homeScreenReducer,
+});
+
+export default connect(mapStateToProps, {getSearchData})(SearchScreen);
 
 const styles = StyleSheet.create({
   searchContainer: {

@@ -1,5 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, FlatList, Text, View} from 'react-native';
+import React, {useEffect} from 'react';
+import {
+  StyleSheet,
+  FlatList,
+  Text,
+  View,
+  ActivityIndicator,
+} from 'react-native';
+import PropTypes from 'prop-types';
 
 //Components
 import Card from '../components/Card';
@@ -7,24 +14,24 @@ import Card from '../components/Card';
 //Icons
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const NewsSource = ({route, navigation}) => {
+//Redux
+import {connect} from 'react-redux';
+
+//actions
+import {getSourceData} from '../actions/homeScreenAction';
+
+const NewsSource = ({
+  route,
+  navigation,
+  getSourceData,
+  homeScreenReducer: {sourceData, loading},
+}) => {
   const {sourceId} = route.params[0];
-  const [sourceData, setSourceData] = useState({});
 
   useEffect(() => {
-    fetchSourceData(sourceId);
+    getSourceData(sourceId);
   }, []);
 
-  const fetchSourceData = (sourceId) => {
-    fetch(
-      `http://newsapi.org/v2/top-headlines?sources=${sourceId}&apiKey=847e59bd8f874476998547a9ca76867d`,
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setSourceData(data.articles);
-      });
-  };
-  // console.log(sourceData);
   return (
     <View>
       <View style={styles.newsSourceContainer}>
@@ -38,27 +45,42 @@ const NewsSource = ({route, navigation}) => {
           <Text style={styles.newsSourceText}>News By The Times of India</Text>
         </View>
       </View>
-      <FlatList
-        keyExtractor={(item) => item.title}
-        data={sourceData}
-        renderItem={({item}) => {
-          return (
-            <Card
-              name={item.source.name}
-              title={item.title}
-              description={item.description}
-              urlToImage={item.urlToImage}
-              content={item.content}
-              author={item.author}
-            />
-          );
-        }}
-      />
+
+      {loading ? (
+        <View style={styles.activityIndicatorContainer}>
+          <ActivityIndicator size="large" color="red" />
+        </View>
+      ) : (
+        <FlatList
+          keyExtractor={(item) => item.title}
+          data={sourceData}
+          renderItem={({item}) => {
+            return (
+              <Card
+                name={item.source.name}
+                title={item.title}
+                description={item.description}
+                urlToImage={item.urlToImage}
+                content={item.content}
+                author={item.author}
+              />
+            );
+          }}
+        />
+      )}
     </View>
   );
 };
+NewsSource.prototypes = {
+  homeScreenReducer: PropTypes.object.isRequired,
+  getSourceData: PropTypes.func.isRequired,
+};
 
-export default NewsSource;
+const mapStateToProps = (state) => ({
+  homeScreenReducer: state.homeScreenReducer,
+});
+
+export default connect(mapStateToProps, {getSourceData})(NewsSource);
 
 const styles = StyleSheet.create({
   newsSourceContainer: {

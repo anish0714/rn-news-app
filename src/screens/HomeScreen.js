@@ -1,34 +1,23 @@
-import React, {useEffect, useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  ActivityIndicator,
-} from 'react-native';
+import React, {useEffect} from 'react';
+import {StyleSheet, View, FlatList, ActivityIndicator} from 'react-native';
+import PropTypes from 'prop-types';
 
 //Components
 import Header from '../components/Header';
 import Card from '../components/Card';
 
+//Redux
+import {connect} from 'react-redux';
 
-const HomeScreen = () => {
-  const [newsData, setNewsData] = useState({});
-  const [loading, setLoading] = useState(true);
+//actions
+import {getHeadlines} from '../actions/homeScreenAction';
+
+const HomeScreen = ({homeScreenReducer: {newsData, loading}, getHeadlines}) => {
   useEffect(() => {
-    fetchNews();
+    getHeadlines();
   }, []);
 
-  const fetchNews = () => {
-    fetch(
-      'http://newsapi.org/v2/top-headlines?country=in&category=general&apiKey=265c0a6f361f468f880f6ef912a16b30',
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setNewsData(data.articles);
-        setLoading(false);
-      });
-  };
-  //console.log('content=', newsData[1].content);
+
   return (
     <View style={styles.homeScreenView}>
       <Header />
@@ -58,7 +47,16 @@ const HomeScreen = () => {
   );
 };
 
-export default HomeScreen;
+HomeScreen.propTypes = {
+  homeScreenReducer: PropTypes.object.isRequired,
+  getHeadlines: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  homeScreenReducer: state.homeScreenReducer,
+});
+
+export default connect(mapStateToProps, {getHeadlines})(HomeScreen);
 
 const styles = StyleSheet.create({
   homeScreenView: {
