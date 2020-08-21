@@ -1,3 +1,3 @@
-export const API_KEY = '847e59bd8f874476998547a9ca76867d';
+export const API_KEY = 'PASTE_YOUR_API_KEY_HERE';
 export const COUNTRY_CODE = 'in';
 export const CATEGORY = 'general';
