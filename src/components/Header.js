@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 
-//Icons 
+//Icons
 import Icon from 'react-native-vector-icons/Ionicons';
 
 //Navigation
@@ -32,9 +32,10 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   headerText: {
+    fontFamily: 'Roboto-BlackItalic',
     fontSize: 22,
     margin: 8,
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     color: 'white',
   },
   headerIcon: {
